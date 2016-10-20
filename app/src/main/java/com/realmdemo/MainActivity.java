@@ -42,9 +42,19 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         btn_Update.setOnClickListener(this);
         btn_Delete.setOnClickListener(this);
         context = this;
-
+/**
+ * Created by yangshirong on 2016/10/20 13:55.
+ *邮箱 ysr200808@163.com
+ * 不同的activity使用同一个.realm文件时配置必须相同；
+ *所有操作都必须在事务内执行；
+ */
         realmConfiguration = new RealmConfiguration
                 .Builder(this)
+                .name("first.realm")
+                .schemaVersion(1)//版本号
+                //  .setModules(xxxx)//不懂
+                //  .migration(xxxx)//不懂
+                //  .inMemory()//设置后会放在缓存中
                 .build();
 
         realm = Realm.getInstance(realmConfiguration);
@@ -68,13 +78,14 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                 break;
         }
     }
+
     //删除数据
     private void testDelete() {
         realm.executeTransaction(new Realm.Transaction() {
             @Override
             public void execute(Realm realm) {
                 User user = realm.where(User.class).equalTo("name", "user1").findFirst();
-                if (null!=user) {
+                if (null != user) {
                     user.deleteFromRealm();
                 }
                 Toast.makeText(context, "删除成功", Toast.LENGTH_LONG).show();
@@ -91,6 +102,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                 if (null != user) {
                     user.setName("Feng");
                     user.setAge(20);
+                    realm.commitTransaction();//提交事务
                 }
                 Toast.makeText(context, "更新成功", Toast.LENGTH_LONG).show();
             }
